@@ -49,8 +49,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AndroidLib">
-      <HintPath>..\..\..\..\..\Downloads\AndroidLib\AndroidLib.dll</HintPath>
+    <Reference Include="AndroidLib, Version=1.2.2.0, Culture=neutral, PublicKeyToken=d16c900ab8e21a17, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\AndroidLib (2)\AndroidLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -119,6 +120,21 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LG-Spectrum.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lg-revolution-review.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\286284-lg-lucid-verizon-wireless.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1532 - epic fail star_wars.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\root.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
