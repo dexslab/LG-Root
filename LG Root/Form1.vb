@@ -68,6 +68,90 @@ Public Class Form1
             TextBox1.Text += "I have failed to remount your system partition please try again" + vbCrLf
         End If
     End Sub
+    Public Sub SpecUnroot()
+        Dim gpsEnv As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/gpscfg/gps_env.conf 2>/dev/null")
+        Dim gpsEnv2 As AdbCommand = Adb.FormAdbShellCommand(device, False, "ln", "-s /data /data/gpscfg/gps_env.conf")
+        Dim localProp As AdbCommand = Adb.FormAdbShellCommand(device, False, "echo", "'ro.kernel.qemu=1' > /data/local.prop")
+        Dim cleanUp As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/local.prop")
+        Dim cleanUp2 As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/gpscfg/*")
+        Dim cleanUp3 As AdbCommand = Adb.FormAdbShellCommand(device, False, "chmod", "771 /data")
+        TextBox1.Text += "Pwning Root stage 1" + vbCrLf
+        Adb.ExecuteAdbCommandNoReturn(gpsEnv)
+        Adb.ExecuteAdbCommandNoReturn(gpsEnv2)
+        TextBox1.Text += "Rebooting" + vbCrLf
+        reboot()
+        TextBox1.Text += "Waiting for device" + vbCrLf
+        android.WaitForDevice()
+        TextBox1.Text += "Pwning Root stage 2" + vbCrLf
+        Adb.ExecuteAdbCommandNoReturn(localProp)
+        TextBox1.Text += "Rebooting again..." + vbCrLf
+        reboot()
+        TextBox1.Text += "Waiting for device" + vbCrLf
+        android.WaitForDevice()
+        TextBox1.Text += "Remounting System" + vbCrLf
+        remount()
+        If failedRemount = False Then
+            Dim rmBBox As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/system/bin/busybox")
+            Dim rmBB As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/system/xbin/busybox")
+            Dim rmSu As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/system/bin/su")
+            Dim rmSuAPK As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/system/app/Superuser.apk")
+            Adb.ExecuteAdbCommandNoReturn(rmBB)
+            Adb.ExecuteAdbCommandNoReturn(rmBBox)
+            Adb.ExecuteAdbCommandNoReturn(rmSu)
+            Adb.ExecuteAdbCommandNoReturn(rmSuAPK)
+            Adb.ExecuteAdbCommandNoReturn(cleanUp)
+            Adb.ExecuteAdbCommandNoReturn(cleanUp2)
+            Adb.ExecuteAdbCommandNoReturn(cleanUp3)
+        Else
+            TextBox1.Text += "I have failed to remount your system partition please try again" + vbCrLf
+        End If
+    End Sub
+    Public Sub specRoot()
+        Dim busyBox As AdbCommand = Adb.FormAdbCommand("push", "busybox /system/xbin/busybox")
+        Dim suBin As AdbCommand = Adb.FormAdbCommand("push", "su /system/bin/su")
+        Dim superApk As AdbCommand = Adb.FormAdbCommand("push", "Superuser.apk /system/app/Superuser.apk")
+        Dim gpsEnv As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/gpscfg/gps_env.conf 2>/dev/null")
+        Dim gpsEnv2 As AdbCommand = Adb.FormAdbShellCommand(device, False, "ln", "-s /data /data/gpscfg/gps_env.conf")
+        Dim localProp As AdbCommand = Adb.FormAdbShellCommand(device, False, "echo", "'ro.kernel.qemu=1' > /data/local.prop")
+        Dim cleanUp As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/local.prop")
+        Dim cleanUp2 As AdbCommand = Adb.FormAdbShellCommand(device, False, "rm", "/data/gpscfg/*")
+        Dim cleanUp3 As AdbCommand = Adb.FormAdbShellCommand(device, False, "chmod", "771 /data")
+        TextBox1.Text += "Pwning Root stage 1" + vbCrLf
+        Adb.ExecuteAdbCommandNoReturn(gpsEnv)
+        Adb.ExecuteAdbCommandNoReturn(gpsEnv2)
+        TextBox1.Text += "Rebooting" + vbCrLf
+        reboot()
+        TextBox1.Text += "Waiting for device" + vbCrLf
+        android.WaitForDevice()
+        TextBox1.Text += "Pwning Root stage 2" + vbCrLf
+        Adb.ExecuteAdbCommandNoReturn(localProp)
+        TextBox1.Text += "Rebooting again..." + vbCrLf
+        reboot()
+        TextBox1.Text += "Waiting for device" + vbCrLf
+        android.WaitForDevice()
+        TextBox1.Text += "Remounting System" + vbCrLf
+        remount()
+        If failedRemount = False Then
+            TextBox1.Text += "Installing Root files" + vbCrLf
+            Dim suMod As AdbCommand = Adb.FormAdbShellCommand(device, False, "chmod", "6755 /system/bin/su")
+            Dim suLn As AdbCommand = Adb.FormAdbShellCommand(device, False, "ln", "-s /system/bin/su /system/xbin/su")
+            Dim bbInstall As AdbCommand = Adb.FormAdbShellCommand(device, False, "/system/xbin/busybox", "--install /system/xbin")
+            Dim bbMod As AdbCommand = Adb.FormAdbShellCommand(device, False, "chmod", "755 /system/xbin/busybox")
+            Adb.ExecuteAdbCommandNoReturn(suBin)
+            Adb.ExecuteAdbCommandNoReturn(suMod)
+            Adb.ExecuteAdbCommandNoReturn(suLn)
+            Adb.ExecuteAdbCommandNoReturn(superApk)
+            Adb.ExecuteAdbCommandNoReturn(busyBox)
+            Adb.ExecuteAdbCommandNoReturn(bbMod)
+            Adb.ExecuteAdbCommandNoReturn(bbInstall)
+            TextBox1.Text += "Cleaning up the mess" + vbCrLf
+            Adb.ExecuteAdbCommandNoReturn(cleanUp)
+            Adb.ExecuteAdbCommandNoReturn(cleanUp2)
+            Adb.ExecuteAdbCommand(cleanUp3)
+        Else
+            TextBox1.Text += "I have failed to remount your system partition please try again" + vbCrLf
+        End If
+    End Sub
     Public Sub esteemRoot()
         Dim busyBox As AdbCommand = Adb.FormAdbCommand("push", "busybox /system/xbin/busybox")
         Dim suBin As AdbCommand = Adb.FormAdbCommand("push", "su /system/bin/su")
@@ -126,13 +210,15 @@ Public Class Form1
         If model = "VS910 4G" Then
             TextBox1.Text += "Remounting System" + vbCrLf
             remount()
+            If device.BuildProp.GetProp("ro.build.version.incremental").Contains("ZV9") Then
+                Adb.ExecuteAdbCommand(mvRecsh)
+            End If
             TextBox1.Text += "Pushing Recovery Files" + vbCrLf
             TextBox1.Text += Adb.ExecuteAdbCommand(cwmPushRevo) + vbCrLf
             TextBox1.Text += "Backing up Original Recovery" + vbCrLf
             TextBox1.Text += Adb.ExecuteAdbCommand(revoBackup) + vbCrLf
             TextBox1.Text += "Flashing CWM Recovery" + vbCrLf
             TextBox1.Text += Adb.ExecuteAdbCommand(cwmFlashRevo) + vbCrLf
-            Adb.ExecuteAdbCommandNoReturn(mvRecsh)
             TextBox1.Text += "Rebooting into CWM" + vbCrLf
             device.RebootRecovery()
         ElseIf model = "VS840 4G" Then
@@ -193,7 +279,11 @@ Public Class Form1
         Try
             deviceList()
             modelNum()
-            esteemRoot()
+            If model = "VS920 4G" Then
+                specRoot()
+            Else
+                esteemRoot()
+            End If
             reboot()
             android.WaitForDevice()
             Delay(15)
@@ -222,7 +312,11 @@ Public Class Form1
         Try
             deviceList()
             modelNum()
-            esteemRoot()
+            If model = "VS920 4G" Then
+                specRoot()
+            Else
+                esteemRoot()
+            End If
             cwm()
             android.WaitForDevice()
             Delay(30)
@@ -242,7 +336,11 @@ Public Class Form1
     Private Sub unroot_Click(sender As System.Object, e As System.EventArgs) Handles unroot.Click
         deviceList()
         modelNum()
-        esteemUnroot()
+        If model = "VS920 4G" Then
+            SpecUnroot()
+        Else
+            esteemUnroot()
+        End If
         Delay(30)
         Dim cwmPushRevo As AdbCommand = Adb.FormAdbCommand("push", "revostock.img /data/local/tmp/revostock.img")
         Dim revoBackup As AdbCommand = Adb.FormAdbShellCommand(device, False, "dd", "if=/dev/block/mmcblk0p14 of=/sdcard/mmcblk0p14.backup2")
