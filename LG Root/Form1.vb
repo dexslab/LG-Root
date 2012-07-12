@@ -28,6 +28,14 @@ Public Class Form1
         Dim remount As AdbCommand = Adb.FormAdbCommand("remount")
         If Adb.ExecuteAdbCommand(remount).Contains("remount failed") Then
             failedRemount = True
+            Dim sysRemount As AdbCommand = Adb.FormAdbShellCommand(device, True, "mount", "-orw,remount /dev/block/system /system")
+            If Adb.ExecuteAdbCommandReturnExitCode(sysRemount) = 0 Then
+                TextBox1.Text += "Remount Succeed"
+                failedRemount = False
+            Else
+                TextBox1.Text += "Remount Failed once again"
+                failedRemount = True
+            End If
         Else
             failedRemount = False
         End If
